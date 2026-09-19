@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    match /usuarios/{userId} {
+      allow create, read, update, delete: if owner(userId);
+    }
+
+    match /motos/{motoId} {
+      allow create: if owner(request.resource.data.userId);
+      allow read, delete: if owner(resource.data.userId);
+      allow update: if owner(resource.data.userId)
+        && request.resource.data.userId == resource.data.userId;
+
+      match /manutencoes/{manutencaoId} {
+        allow read, create, update, delete: if signedIn()
+          && get(/databases/$(database)/documents/motos/$(motoId)).data.userId == request.auth.uid;
+      }
+    }
+
+    match /abastecimentos/{abastecimentoId} {
+      allow create: if owner(request.resource.data.userId);
+      allow read, delete: if owner(resource.data.userId);
+      allow update: if owner(resource.data.userId)
+        && request.resource.data.userId == resource.data.userId;
+    }
+
+    match /viagens/{viagemId} {
+      allow create: if owner(request.resource.data.userId);
+      allow read: if resource.data.isPublica == true || owner(resource.data.userId);
+      allow delete: if owner(resource.data.userId);
+      allow update: if owner(resource.data.userId)
+        && request.resource.data.userId == resource.data.userId;
+    }
+
+    match /eventos/{eventoId} {
+      allow read: if true;
+      allow create: if owner(request.resource.data.userId);
+      allow delete: if owner(resource.data.userId);
+      allow update: if owner(resource.data.userId)
+        && request.resource.data.userId == resource.data.userId;
+    }
+  }
+}

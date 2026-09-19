@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "MotoHub",
+    "slug": "motohub",
+    "scheme": "br.com.fotosemoto.motohub",
+    "version": "2.0.3",
+    "orientation": "portrait",
+    "icon": "./assets/icon-motohub.png",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#000000",
+    "splash": {
+      "image": "./assets/icon-motohub-foreground.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "icon": "./assets/icon-motohub.png",
+      "package": "br.com.fotosemoto.motohub",
+      "googleServicesFile": "./google-services.json",
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ],
+      "adaptiveIcon": {
+        "backgroundColor": "#000000",
+        "foregroundImage": "./assets/icon-motohub-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/icon-motohub.png"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#000000",
+          "image": "./assets/icon-motohub-foreground.png",
+          "imageWidth": 240,
+          "resizeMode": "contain"
+        }
+      ],
+      "expo-web-browser",
+      "@react-native-community/datetimepicker"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e267f3ef-3f9e-4361-9948-65896fe30c02"
+      }
+    },
+    "owner": "moto-hub-fotos-e-motos-team"
+  }
+}
