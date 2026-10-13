@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -17,22 +17,35 @@ import { BottomSheetMenu } from '../components/BottomSheetMenu';
 import { deleteUser, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../services/firebase';
+import { useFocusEffect } from '@react-navigation/native';
+import { buscarMeuApoiador } from '../services/apoiadores';
+import { FotoPerfil } from '../components/FotoPerfil';
 import { deleteAccountData } from '../services/account';
 
 export function Perfil({ navigation }: any) {
+  const [temCadastroApoiador, setTemCadastroApoiador] = useState(false);
+  useFocusEffect(useCallback(() => {
+    let active = true;
+    buscarMeuApoiador().then(cadastro => { if (active) setTemCadastroApoiador(!!cadastro); }).catch(() => { if (active) setTemCadastroApoiador(false); });
+    return () => { active = false; };
+  }, []));
   const [isVerificado, setIsVerificado] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
+  const [fotoUrl, setFotoUrl] = useState('');
   const [nome, setNome] = useState('');
   const [apelido, setApelido] = useState('');
   const [email, setEmail] = useState(auth.currentUser?.email ?? '');
 
-  useEffect(() => {
+  useFocusEffect(useCallback(() => {
+    let active = true;
     const carregarPerfil = async () => {
       const user = auth.currentUser;
       if (!user) return;
       try {
         const snapshot = await getDoc(doc(db, 'usuarios', user.uid));
+        if (!active) return;
         const dados = snapshot.data();
+        setFotoUrl(dados?.fotoUrl ?? '');
         setNome(dados?.nomeCompleto ?? user.displayName ?? 'Motociclista');
         setApelido(dados?.apelido ?? '');
         setEmail(dados?.email ?? user.email ?? '');
@@ -42,7 +55,8 @@ export function Perfil({ navigation }: any) {
       }
     };
     carregarPerfil();
-  }, []);
+    return () => { active = false; };
+  }, []));
 
   const handleAlterarInformacoes = () => {
     navigation?.navigate('EditarPerfil');
@@ -120,10 +134,7 @@ export function Perfil({ navigation }: any) {
         
         {/* User Info Card */}
         <View style={styles.profileCard}>
-          <Image 
-            source={require('../../assets/perfilvermelho.webp')} 
-            style={styles.profileImage} 
-          />
+          <FotoPerfil uri={fotoUrl} size={64} />
           
           <View style={styles.profileInfo}>
             <Text style={styles.userName}>{nome || 'Motociclista'}</Text>
@@ -137,6 +148,21 @@ export function Perfil({ navigation }: any) {
         </View>
 
         <Text style={styles.sectionTitle}>CONFIGURAÇÕES DA CONTA</Text>
+
+        <TouchableOpacity
+          style={styles.btnOutline}
+          onPress={() => navigation.navigate('Garagem')}
+          accessibilityRole="button"
+          accessibilityLabel="Minha Garagem"
+        >
+          <MaterialCommunityIcons name="motorbike" size={20} color="#FFFFFF" style={styles.btnIcon} />
+          <Text style={styles.btnOutlineText}>Minha Garagem</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.btnOutline} onPress={() => navigation.navigate('CadastroApoiador')} accessibilityRole="button">
+          <MaterialCommunityIcons name="handshake-outline" size={20} color="#FFFFFF" style={styles.btnIcon} />
+          <Text style={styles.btnOutlineText}>{temCadastroApoiador ? 'Meu cadastro de Apoiador' : 'Torne-se um Apoiador'}</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.btnOutline} onPress={handleAlterarInformacoes}>
           <MaterialCommunityIcons name="pencil-outline" size={20} color="#FFFFFF" style={styles.btnIcon} />

@@ -13,7 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { deleteDoc, doc, collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../services/firebase';
+import { auth, db } from '../services/firebase';
 import { calcularConsumoMedio } from '../services/consumo';
 
 interface HistoricoManutencao {
@@ -33,7 +33,8 @@ export function PerfilDaMoto({ route, navigation }: any) {
   // Busca o histórico de manutenções desta moto específica no Firestore
   useEffect(() => {
     const fetchHistorico = async () => {
-      if (!moto?.id) return;
+      const user = auth.currentUser;
+      if (!moto?.id || !user) return;
 
       try {
         // Buscando na subcoleção 'manutencoes' dentro do documento da moto
@@ -47,7 +48,11 @@ export function PerfilDaMoto({ route, navigation }: any) {
         setHistorico(lista);
 
         const abastecimentosSnapshot = await getDocs(
-          query(collection(db, 'abastecimentos'), where('motoId', '==', moto.id)),
+          query(
+            collection(db, 'abastecimentos'),
+            where('motoId', '==', moto.id),
+            where('userId', '==', user.uid),
+          ),
         );
         const registros = abastecimentosSnapshot.docs.map((item) => item.data());
         setConsumoMedio(calcularConsumoMedio(registros));

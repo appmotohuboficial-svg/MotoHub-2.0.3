@@ -10,6 +10,71 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == userId;
     }
 
+    // Cadastro publicado em apoiadores/{uid}: leitura apenas para usuários
+    // autenticados; criação, edição e exclusão exclusivamente pelo titular.
+    // Campos obrigatórios: userId, nome (1-80), cidade (1-80), uf,
+    // contato (1-120), descricao (0-1000), tipos (1-6 únicos), timestamps.
+    function validApoiador(data) {
+      return data.keys().hasAll(['userId','nome','cidade','uf','contato','descricao','tipos','createdAt','updatedAt'])
+        && data.keys().hasOnly(['userId','nome','cidade','uf','contato','descricao','tipos','createdAt','updatedAt','fotoUrl','estado'])
+        && (!('estado' in data) || data.estado in ['oculto','pausado'])
+        && (!('fotoUrl' in data) || (data.fotoUrl is string && data.fotoUrl.size() <= 1500
+          && data.fotoUrl.matches('https://firebasestorage.googleapis.com/v0/b/app-motohub-oficial[.]firebasestorage[.]app/o/usuarios%2F' + request.auth.uid + '%2Fperfil%2F.*')))
+        && data.userId is string
+        && data.nome is string && data.nome.size() > 0 && data.nome.size() <= 80
+        && data.nome.matches('.*[^ ].*')
+        && data.cidade is string && data.cidade.size() > 0 && data.cidade.size() <= 80
+        && data.cidade.matches('.*[^ ].*')
+        && data.uf in ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO']
+        && data.contato is string && data.contato.size() > 0 && data.contato.size() <= 120
+        && data.contato.matches('.*[^ ].*')
+        && data.descricao is string && data.descricao.size() <= 1000
+        && data.tipos is list && data.tipos.size() > 0 && data.tipos.size() <= 6
+        && data.tipos.toSet().size() == data.tipos.size()
+        && data.tipos.toSet().hasOnly(['Hospedagem','Banho','Alimentação','Garagem','Ferramentas','Outros'])
+        && data.createdAt is timestamp && data.updatedAt is timestamp;
+    }
+
+    match /apoiadores/{userId} {
+      allow read: if signedIn();
+      allow create: if owner(userId) && request.resource.data.userId == userId
+        && validApoiador(request.resource.data)
+        && !('estado' in request.resource.data)
+        && (request.resource.data.createdAt == request.time
+          || (exists(/databases/$(database)/documents/participacoesApoiadores/$(userId))
+            && request.resource.data.createdAt == get(/databases/$(database)/documents/participacoesApoiadores/$(userId)).data.createdAt))
+        && !existsAfter(/databases/$(database)/documents/participacoesApoiadores/$(userId))
+        && request.resource.data.updatedAt == request.time;
+      allow update: if owner(userId) && resource.data.userId == userId
+        && request.resource.data.userId == resource.data.userId
+        && validApoiador(request.resource.data)
+        && !('estado' in request.resource.data)
+        && !existsAfter(/databases/$(database)/documents/participacoesApoiadores/$(userId))
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if owner(userId);
+    }
+
+
+    // Cadastro oculto/pausado: leitura exclusiva do titular, sem consulta pública.
+    match /participacoesApoiadores/{userId} {
+      allow read, delete: if owner(userId);
+      allow create: if owner(userId) && request.resource.data.userId == userId
+        && validApoiador(request.resource.data)
+        && request.resource.data.estado in ['oculto','pausado']
+        && request.resource.data.updatedAt == request.time
+        && exists(/databases/$(database)/documents/apoiadores/$(userId))
+        && request.resource.data.createdAt == get(/databases/$(database)/documents/apoiadores/$(userId)).data.createdAt
+        && !existsAfter(/databases/$(database)/documents/apoiadores/$(userId));
+      allow update: if owner(userId) && resource.data.userId == userId
+        && request.resource.data.userId == resource.data.userId
+        && validApoiador(request.resource.data)
+        && request.resource.data.estado in ['oculto','pausado']
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.updatedAt == request.time
+        && !existsAfter(/databases/$(database)/documents/apoiadores/$(userId));
+    }
+
     match /usuarios/{userId} {
       allow create, read, update, delete: if owner(userId);
     }

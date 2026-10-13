@@ -8,12 +8,59 @@ import {
   ScrollView,
   StatusBar,
   Alert,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
+import { salvarFotoPerfil } from '../services/fotoPerfil';
+import { removeTemporaryImage } from '../services/temporaryImages';
+import { formatarTelefoneApoiador } from '../utils/telefoneApoiador';
+import { FotoPerfil } from '../components/FotoPerfil';
 import { auth, db } from '../services/firebase';
 
 export function EditarPerfil({ navigation }: any) {
+  const [fotoUrl, setFotoUrl] = useState('');
+  const [salvandoFoto, setSalvandoFoto] = useState(false);
+  const escolherFoto = async () => {
+    if (salvandoFoto || isLoading) return;
+    let selecionada: string | undefined;
+    let processada: string | undefined;
+    setSalvandoFoto(true);
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) { Alert.alert('Permissão necessária', 'Permita o acesso à galeria para escolher sua foto.'); return; }
+      const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsEditing: true, aspect: [1, 1], quality: 0.8 });
+      if (result.canceled) return;
+      selecionada = result.assets[0].uri;
+      const image = await ImageManipulator.manipulateAsync(selecionada, [{ resize: { width: 512 } }], { compress: 0.75, format: ImageManipulator.SaveFormat.JPEG });
+      processada = image.uri;
+      const url = await salvarFotoPerfil(processada);
+      setFotoUrl(url);
+      Alert.alert('Foto salva', 'Sua foto foi atualizada no perfil e no cadastro de Apoiador.');
+    } catch (error: any) {
+      const code = error?.code || 'foto/selecionar-ou-processar';
+      const etapa = error?.etapa || 'seleção ou processamento';
+      console.warn('Falha foto de perfil:', etapa, code, error?.message);
+      const detalhe = code === 'foto/tamanho-excedido' ? 'A foto deve ter até 2 MB após o recorte.'
+        : code === 'foto/formato-invalido' ? 'Não foi possível converter a imagem para JPEG.'
+        : code === 'foto/arquivo-ausente' ? 'A imagem selecionada não pôde ser lida. Escolha a foto novamente.'
+        : code === 'permission-denied' || code === 'storage/unauthorized'
+        ? 'O Firebase recusou a permissão para salvar a foto.'
+        : code === 'storage/object-not-found' || code === 'storage/bucket-not-found'
+        ? 'O armazenamento da foto não foi encontrado.'
+        : code === 'storage/retry-limit-exceeded' || code === 'unavailable'
+        ? 'Não foi possível concluir a conexão com o Firebase.'
+        : 'Não foi possível concluir a foto nesta etapa.';
+      Alert.alert('Não foi possível salvar a foto', detalhe + '\nEtapa: ' + etapa + '\nCódigo: ' + code + '\nSua foto anterior foi preservada.');
+    }
+    finally {
+      if (processada) await removeTemporaryImage(processada);
+      if (selecionada) await removeTemporaryImage(selecionada);
+      setSalvandoFoto(false);
+    }
+  };
   // Estados para os campos do formulário
   const [nomeCompleto, setNomeCompleto] = useState('');
   const [apelido, setApelido] = useState('');
@@ -29,7 +76,8 @@ export function EditarPerfil({ navigation }: any) {
         const dados = snapshot.data();
         setNomeCompleto(dados?.nomeCompleto ?? '');
         setApelido(dados?.apelido ?? '');
-        setTelefone(dados?.telefone ?? '');
+        setTelefone(formatarTelefoneApoiador(dados?.telefone ?? ''));
+        setFotoUrl(dados?.fotoUrl ?? '');
       } catch {
         Alert.alert('Erro', 'Não foi possível carregar seus dados.');
       }
@@ -85,6 +133,11 @@ export function EditarPerfil({ navigation }: any) {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         
+        <TouchableOpacity onPress={escolherFoto} disabled={salvandoFoto || isLoading} accessibilityRole="button" accessibilityLabel="Alterar foto do perfil" style={{ alignItems: 'center', marginBottom: 28 }}>
+          <FotoPerfil uri={fotoUrl} size={100} />
+          <Text style={{ color: '#E53935', marginTop: 12, fontWeight: 'bold' }}>{salvandoFoto ? 'Salvando foto...' : 'Escolher foto do perfil'}</Text>
+          <Text style={{ color: '#AAAAAA', marginTop: 6, textAlign: 'center' }}>Sua foto também aparece em Apoiadores.</Text>
+        </TouchableOpacity>
         {/* Nome Completo */}
         <Text style={styles.label}>NOME COMPLETO</Text>
         <TextInput
@@ -110,18 +163,18 @@ export function EditarPerfil({ navigation }: any) {
         <Text style={[styles.label, { marginTop: 20 }]}>TELEFONE / WHATSAPP</Text>
         <TextInput
           style={styles.input}
-          placeholder="(00) 00000-0000"
+          placeholder="(045) 999-669-251"
           placeholderTextColor="#777"
           keyboardType="phone-pad"
           value={telefone}
-          onChangeText={setTelefone}
+          onChangeText={value => setTelefone(formatarTelefoneApoiador(value))}
         />
 
         {/* Botão Salvar */}
         <TouchableOpacity 
           style={[styles.btnPrimary, isLoading && styles.btnDisabled]} 
           onPress={handleSalvarAlteracoes}
-          disabled={isLoading}
+          disabled={isLoading || salvandoFoto}
         >
           <Text style={styles.btnPrimaryText}>SALVAR ALTERAÇÕES</Text>
         </TouchableOpacity>
@@ -214,3 +267,4 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
+

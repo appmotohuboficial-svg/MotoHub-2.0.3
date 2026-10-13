@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MotoclubeIcon } from './MotoclubeIcon';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface BottomNavProps {
@@ -47,49 +48,45 @@ export function BottomNav({ state, navigation, onPressFab }: BottomNavProps) {
         <Text style={[styles.navText, isActive('HomeLogada') && styles.navTextActive]}>Home</Text>
       </TouchableOpacity>
 
-      {/* Botão Garagem */}
+      {/* Botão Apoiadores */}
       <TouchableOpacity 
         style={styles.navItem} 
-        onPress={() => navigateTo('Garagem')}
-        activeOpacity={0.7}
-      >
-        <MaterialCommunityIcons 
-          name="motorbike" 
-          size={24} 
-          color={isActive('Garagem') ? '#E53935' : '#888888'} 
-        />
-        <Text style={[styles.navText, isActive('Garagem') && styles.navTextActive]}>Garagem</Text>
-      </TouchableOpacity>
-
-      {/* Espaço reservado para o FAB Central */}
-      <View style={styles.fabSpacer} />
-
-      {/* Botão Parceiros */}
-      <TouchableOpacity 
-        style={styles.navItem} 
-        onPress={() => navigateTo('Parceiros')}
+        onPress={() => navigateTo('Apoiadores')}
         activeOpacity={0.7}
       >
         <MaterialCommunityIcons 
           name="handshake-outline" 
           size={24} 
-          color={isActive('Parceiros') ? '#E53935' : '#888888'} 
+          color={isActive('Apoiadores') ? '#E53935' : '#888888'} 
         />
-        <Text style={[styles.navText, isActive('Parceiros') && styles.navTextActive]}>Parceiros</Text>
+        <Text style={[styles.navText, isActive('Apoiadores') && styles.navTextActive]}>Apoiadores</Text>
       </TouchableOpacity>
 
-      {/* Botão Perfil */}
+      {/* Espaço reservado para o FAB Central */}
+      <View style={styles.fabSpacer} />
+
+      {/* Botão Empresas Parceiras */}
       <TouchableOpacity 
         style={styles.navItem} 
-        onPress={() => navigateTo('Perfil')}
-        activeOpacity={0.7}
+        onPress={() => navigateTo('Parceiros')}
+        activeOpacity={0.7} accessibilityRole="button" accessibilityLabel="Empresas Parceiras"
       >
         <MaterialCommunityIcons 
-          name="account-outline" 
+          name="storefront-outline" 
           size={24} 
-          color={isActive('Perfil') ? '#E53935' : '#888888'} 
+          color={isActive('Parceiros') ? '#E53935' : '#888888'} 
         />
-        <Text style={[styles.navText, isActive('Perfil') && styles.navTextActive]}>Perfil</Text>
+        <Text style={[styles.navText, isActive('Parceiros') && styles.navTextActive]}>Empresas</Text>
+      </TouchableOpacity>
+
+      {/* Botão Motoclube */}
+      <TouchableOpacity 
+        style={styles.navItem} 
+        onPress={() => navigateTo('Motoclubes')}
+        activeOpacity={0.7}
+      >
+        <MotoclubeIcon color={isActive('Motoclubes') ? '#E53935' : '#888888'} />
+        <Text style={[styles.navText, isActive('Motoclubes') && styles.navTextActive]}>Motoclube</Text>
       </TouchableOpacity>
 
       {/* Botão Central Flutuante (FAB) */}

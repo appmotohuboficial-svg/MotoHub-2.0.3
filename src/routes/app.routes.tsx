@@ -16,10 +16,16 @@ import { NovoEvento } from '../screens/NovoEvento';
 import { Perfil } from '../screens/Perfil';
 import { EditarPerfil } from '../screens/EditarPerfil';
 import { DocumentacaoLegal } from '../screens/DocumentacaoLegal';
+import { CadastroParceiro } from '../screens/CadastroParceiro';
 import { Parceiros } from '../screens/Parceiros';
 import { DadosTecnicos } from '../screens/DadosTecnicos';
 import { DetalhesEvento } from '../screens/DetalhesEvento';
 import { DetalhesViagem } from '../screens/DetalhesViagem';
+
+import { PerfilApoiador } from '../screens/PerfilApoiador';
+import { CadastroApoiador } from '../screens/CadastroApoiador';
+import { Apoiadores } from '../screens/Apoiadores';
+import { Motoclubes } from '../screens/Motoclubes';
 
 const Stack = createNativeStackNavigator();
 
@@ -27,6 +33,10 @@ export function AppRoutes() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="HomeLogada" component={HomeLogada} />
+      <Stack.Screen name="PerfilApoiador" component={PerfilApoiador} />
+      <Stack.Screen name="CadastroApoiador" component={CadastroApoiador} />
+      <Stack.Screen name="Apoiadores" component={Apoiadores} />
+      <Stack.Screen name="Motoclubes" component={Motoclubes} />
       <Stack.Screen name="Garagem" component={Garagem} />
       <Stack.Screen name="NovoCadastroMotos" component={NovoCadastroMotos} />
       <Stack.Screen name="PerfilDaMoto" component={PerfilDaMoto} />
@@ -41,6 +51,7 @@ export function AppRoutes() {
       <Stack.Screen name="Perfil" component={Perfil} />
       <Stack.Screen name="EditarPerfil" component={EditarPerfil} />
       <Stack.Screen name="DocumentacaoLegal" component={DocumentacaoLegal} />
+      <Stack.Screen name="CadastroParceiro" component={CadastroParceiro} />
       <Stack.Screen name="Parceiros" component={Parceiros} />
       <Stack.Screen name="DadosTecnicos" component={DadosTecnicos} />
       <Stack.Screen name="DetalhesEvento" component={DetalhesEvento} />

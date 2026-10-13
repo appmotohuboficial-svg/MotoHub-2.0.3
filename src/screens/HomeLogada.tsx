@@ -80,6 +80,15 @@ export default function HomeLogada({ navigation }: any) {
           style={styles.header}
         >
           <View style={styles.overlay}>
+            <TouchableOpacity
+              style={styles.profileButton}
+              onPress={() => navigation.navigate('Perfil')}
+              activeOpacity={0.7}
+              accessibilityRole="button"
+              accessibilityLabel="Meu Perfil"
+            >
+              <MaterialCommunityIcons name="account-circle-outline" size={28} color="#E31C1C" />
+            </TouchableOpacity>
             <View style={styles.headerTextContainer}>
               <Text style={styles.title}>Olá, {apelido}</Text>
               <View style={styles.redDash} />
@@ -180,6 +189,19 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000000' },
   header: { width: '100%', height: 220 },
   overlay: { flex: 1, backgroundColor: 'rgba(0, 0, 0, 0.65)', justifyContent: 'flex-end' },
+  profileButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#1A1A1A',
+    borderWidth: 1,
+    borderColor: '#333333',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   headerTextContainer: { paddingHorizontal: 24, paddingBottom: 32 },
   title: { color: '#FFFFFF', fontSize: 28, fontWeight: '900' },
   redDash: { width: 32, height: 3, backgroundColor: '#E31C1C', marginTop: 8 },

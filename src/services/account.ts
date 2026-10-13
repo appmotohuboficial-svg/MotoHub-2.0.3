@@ -6,7 +6,8 @@ import {
   query,
   where,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { db, storage } from './firebase';
+import { listAll, ref, deleteObject } from 'firebase/storage';
 
 async function deleteOwnedCollection(collectionName: string, userId: string) {
   const snapshot = await getDocs(
@@ -31,5 +32,10 @@ export async function deleteAccountData(userId: string) {
     deleteOwnedCollection('viagens', userId),
     deleteOwnedCollection('eventos', userId),
   ]);
+  await deleteDoc(doc(db, 'apoiadores', userId));
+  await deleteDoc(doc(db, 'participacoesApoiadores', userId));
+  const fotos = await listAll(ref(storage, 'usuarios/' + userId + '/perfil'));
+  await Promise.all(fotos.items.map(item => deleteObject(item)));
   await deleteDoc(doc(db, 'usuarios', userId));
 }
+

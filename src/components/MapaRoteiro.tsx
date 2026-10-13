@@ -49,11 +49,11 @@ function MapaNativo({ coordenadas, pontos = [], origem, destino, passagens, tipo
     key={instancia}
     ref={ref}
     provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
-    style={styles.superficie}
+    style={StyleSheet.absoluteFill}
     initialRegion={coordenadas.length >= 2 ? regiaoDaRota(coordenadas) : REGIAO_BRASIL}
     mapType="standard"
-    onMapReady={() => setPronto(true)}
-    onMapLoaded={() => { setCarregado(true); setDemorou(false); }}
+    onMapReady={() => { setPronto(true); console.log('Mapa MotoHub: pronto; pontos de rota:', coordenadas.length); }}
+    onMapLoaded={() => { setCarregado(true); setDemorou(false); console.log('Mapa MotoHub: carregado'); }}
     onLayout={({ nativeEvent }) => setLayout(nativeEvent.layout.width > 0 && nativeEvent.layout.height > 0)}
     loadingEnabled={false}
     zoomControlEnabled
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, minHeight: 230, backgroundColor: '#1A1A1A' },
   mapa: { flex: 1, minHeight: 150 },
   superficie: { flex: 1, minHeight: 150 },
-  statusMapa: { backgroundColor: '#1C1C1E', padding: 10 },
+  statusMapa: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: '#1C1C1E', padding: 10 },
   calculo: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingBottom: 8 },
   aviso: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 18 },
   texto: { color: '#DDD', textAlign: 'center', marginTop: 8 },
@@ -146,3 +146,5 @@ const styles = StyleSheet.create({
   modalBar: { minHeight: 56, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16 },
   titulo: { fontSize: 18, color: '#FFF', fontWeight: 'bold' },
 });
+
+

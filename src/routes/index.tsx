@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Image, StatusBar, StyleSheet, useWindowDimensions } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
+import { registrarTelaAnalytics } from '../services/analytics';
 import * as SplashScreen from 'expo-splash-screen';
 import { auth } from '../services/firebase';
 import { cleanStaleTemporaryImages } from '../services/temporaryImages';
@@ -12,6 +13,14 @@ import { AppRoutes } from './app.routes';
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function Routes() {
+  const navigationRef = useNavigationContainerRef<Record<string, object | undefined>>();
+  const ultimaTela = useRef<string | undefined>(undefined);
+  const registrarTelaAtual = () => {
+    const tela = navigationRef.getCurrentRoute()?.name;
+    if (!tela || tela === ultimaTela.current) return;
+    ultimaTela.current = tela;
+    void registrarTelaAnalytics(tela);
+  };
   useEffect(() => { void cleanStaleTemporaryImages(); }, []);
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -49,7 +58,7 @@ export default function Routes() {
 
   return (
     <View style={styles.root}>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef} onReady={registrarTelaAtual} onStateChange={registrarTelaAtual}>
         {user ? <AppRoutes /> : <AuthRoutes />}
       </NavigationContainer>
     </View>
