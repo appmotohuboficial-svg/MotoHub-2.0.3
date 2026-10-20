@@ -1,3 +1,4 @@
+
 {
   "expo": {
     "name": "MotoHub",
@@ -8,13 +9,13 @@
     "icon": "./assets/icon-motohub.png",
     "userInterfaceStyle": "light",
     "backgroundColor": "#000000",
-    "splash": {
-      "image": "./assets/icon-motohub-foreground.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
-    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "br.com.fotosemoto.motohub",
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "icon": "./assets/icon-motohub.png",
@@ -45,7 +46,22 @@
       ],
       "expo-web-browser",
       "@react-native-community/datetimepicker",
-      "@react-native-firebase/app",
+      [
+        "@react-native-firebase/app",
+        {
+          "ios": {
+            "disableSPM": true
+          }
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
       [
         "@react-native-firebase/analytics",
         {

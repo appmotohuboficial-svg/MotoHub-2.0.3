@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>418499398928-1j83cniotngej0nltpf0hd7tn0ioibcc.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.418499398928-1j83cniotngej0nltpf0hd7tn0ioibcc</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>418499398928-ipn3q2sfcgscge2o0e3f8o4p4s8pvrqq.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCycveVo6REYpFf3m-j3n6_dvGaOx1O_hI</string>
+	<key>GCM_SENDER_ID</key>
+	<string>418499398928</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>br.com.fotosemoto.motohub</string>
+	<key>PROJECT_ID</key>
+	<string>app-motohub-oficial</string>
+	<key>STORAGE_BUCKET</key>
+	<string>app-motohub-oficial.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:418499398928:ios:ee566d898a3e7491202995</string>
+</dict>
+</plist>
